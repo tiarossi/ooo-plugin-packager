@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.openoffice.plugin.core.utils.FileHelper;
 import org.openoffice.plugin.core.utils.ZipContent;
 
@@ -479,7 +480,6 @@ public class UnoPackage {
      *            the file or directory to add
      */
     private void addZipContent(String pRelativePath, File pFile) {
-        System.out.println("Adding " + pRelativePath + " to oxt package");
         if (pRelativePath != null) {
             if (pFile.isDirectory()) {
                 // Add all the children
@@ -490,7 +490,9 @@ public class UnoPackage {
                 } catch (Exception e) {
                 }
             } else {
-                ZipContent content = new ZipContent(pRelativePath, pFile);
+                String zipPath = FilenameUtils.separatorsToUnix(pRelativePath);
+                System.out.println("Adding " + zipPath + " to oxt package");
+                ZipContent content = new ZipContent(zipPath, pFile);
                 mZipEntries.put(pRelativePath, content);
             }
         }
