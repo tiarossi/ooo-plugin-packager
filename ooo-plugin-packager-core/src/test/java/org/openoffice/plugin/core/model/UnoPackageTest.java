@@ -86,12 +86,13 @@ public final class UnoPackageTest {
 	 */
 	@Test
 	public void testAddContent() throws IOException {
-		File tmpDir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest");
-		tmpDir.mkdir();
-		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
-		FileUtils.writeStringToFile(new File(tmpDir, "README"), "README for testing");
-		FileUtils.writeStringToFile(new File(tmpDir, "hello.properties"), "hello=world");
-		pkg.addContent(null, tmpDir);
+		File tmpdir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest");
+		tmpdir.mkdir();
+		assertTrue(tmpdir + " is not a directory", tmpdir.isDirectory());
+		FileUtils.writeStringToFile(new File(tmpdir, "README"), "README for testing");
+		FileUtils.writeStringToFile(new File(tmpdir, "hello.properties"), "hello=world");
+		log.info(tmpdir + " with 2 files created");
+		pkg.addContent(tmpdir);
 		List<File> files = pkg.getContainedFiles();
 		assertEquals(2, files.size());
 		pkg.close();

@@ -210,6 +210,15 @@ public class UnoPackage {
             throw new IllegalArgumentException("pContent [" + pContent + "] does not exists");
         }
     }
+    
+    /**
+     * Adds the content of the given (root) file or directory.
+     *
+     * @param file the file
+     */
+    public void addContent(File file) {
+    	this.addContent(null, file);
+    }
 
     /**
      * Add a uno component file, for example a jar, shared library or python
