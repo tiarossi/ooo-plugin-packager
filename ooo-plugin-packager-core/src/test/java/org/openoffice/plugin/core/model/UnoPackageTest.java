@@ -28,9 +28,11 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Logger;
 
-import org.junit.Test;
+import org.apache.commons.io.FileUtils;
+import org.junit.*;
 
 /**
  * This is the first JUnit test class for the ooo-plugin-package-core project.
@@ -38,9 +40,32 @@ import org.junit.Test;
  * @author oliver (oliver.boehm@agentes.de)
  * @since 0.0.1 (16.08.2010)
  */
-public class UnoPackageTest {
+public final class UnoPackageTest {
 	
 	private static final Logger log = Logger.getLogger(UnoPackage.class.getName());
+	private File tmpFile;
+	private UnoPackage pkg;
+	
+	/**
+	 * Creates a tmp file for testing.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Before
+	public void setUp() throws IOException {
+		tmpFile = File.createTempFile("test", ".oxt");
+		log.info("using " + tmpFile + " for testing...");
+		pkg = new UnoPackage(tmpFile);
+	}
+	
+	/**
+	 * Here we delete the tmp file after testing.
+	 */
+	@After
+	public void tearDown() {
+		tmpFile.delete();
+		log.info(tmpFile + " is deleted.");
+	}
 
 	/**
 	 * Test method for {@link UnoPackage#UnoPackage(java.io.File)}.
@@ -49,12 +74,27 @@ public class UnoPackageTest {
 	 */
 	@Test
 	public void testUnoPackage() throws IOException {
-		File tmpFile = File.createTempFile("test", ".oxt");
-		log.info("using " + tmpFile + " to create package...");
-		UnoPackage pkg = new UnoPackage(tmpFile);
 		pkg.close();
 		assertTrue(tmpFile.isFile());
-		tmpFile.delete();
+	}
+	
+	/**
+	 * Here we create just two testfiles and check if this will be part of the
+	 * created oxt file.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testAddContent() throws IOException {
+		File tmpDir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest");
+		tmpDir.mkdir();
+		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
+		FileUtils.writeStringToFile(new File(tmpDir, "README"), "README for testing");
+		FileUtils.writeStringToFile(new File(tmpDir, "hello.properties"), "hello=world");
+		pkg.addContent(null, tmpDir);
+		List<File> files = pkg.getContainedFiles();
+		assertEquals(2, files.size());
+		pkg.close();
 	}
 
 }
