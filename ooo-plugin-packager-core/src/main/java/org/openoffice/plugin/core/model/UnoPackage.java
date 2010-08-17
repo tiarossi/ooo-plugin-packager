@@ -224,7 +224,8 @@ public class UnoPackage {
      * @param includes the includes
      * @param excludes the excludes
      */
-    public void addDirectory(File directory, String[] includes, String[] excludes) {
+	public void addDirectory(final File directory, final String[] includes,
+			final String[] excludes) {
     	assert directory.isDirectory();
         if (isBasicLibrary(directory)) {
             addBasicLibraryFile(directory);
@@ -240,10 +241,37 @@ public class UnoPackage {
             		System.out.println(child + " will be excluded");
             		continue;
             	}
+            	String path = child.getName();
             	if (child.isFile()) {
-            		addContent(child.getName(), child);
+            		addContent(path, child);
             	} else {
-            		addDirectory(child, includes, excludes);
+            		addDirectory(path + "/", child, includes, excludes);
+            	}
+            }
+        }
+    }
+    
+    private void addDirectory(final String pathInArchive, final File directory, final String[] includes, final String[] excludes) {
+    	assert directory.isDirectory();
+        if (isBasicLibrary(directory)) {
+            addBasicLibraryFile(pathInArchive, directory);
+        } else if (isDialogLibrary(directory)) {
+            addDialogLibraryFile(pathInArchive, directory);
+        } else {
+            for (File child : directory.listFiles()) {
+            	if ((includes.length > 0) && !match(child, includes)) {
+            		System.out.println(child + " will be not included");
+            		continue;
+            	}
+            	if (match(child, excludes)) {
+            		System.out.println(child + " will be excluded");
+            		continue;
+            	}
+            	String path = pathInArchive + child.getName();
+            	if (child.isFile()) {
+            		addContent(path, child);
+            	} else {
+            		addDirectory(path + "/", child, includes, excludes);
             	}
             }
         }

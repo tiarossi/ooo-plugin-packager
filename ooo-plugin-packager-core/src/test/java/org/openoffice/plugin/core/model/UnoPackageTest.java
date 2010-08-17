@@ -28,10 +28,11 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.zip.*;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.*;
@@ -122,13 +123,17 @@ public final class UnoPackageTest {
 		List<File> files = pkg.getContainedFiles();
 		assertEquals(filenames.length, files.size());
 		pkg.close();
+		checkUnoPackage();
 	}
 	
 	/**
 	 * Here we exclude all CVS files and check it if they are really excluded.
+	 *
+	 * @throws ZipException the zip exception
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testAddDirectory() {
+	public void testAddDirectory() throws ZipException, IOException {
 		String[] includes = {};
 		String[] excludes = { "**/CVS" };
 		pkg.addDirectory(tmpDir, includes, excludes);
@@ -140,6 +145,21 @@ public final class UnoPackageTest {
 			log.info("contained file: " + file);
 		}
 		pkg.close();
+		checkUnoPackage();
+	}
+	
+	private void checkUnoPackage() throws ZipException, IOException {
+        ZipFile zip = new ZipFile(tmpFile);
+        Enumeration<? extends ZipEntry> entries = zip.entries();
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = entries.nextElement();
+			log.debug("entry: " + entry);
+			String entryName = entry.getName();
+			if (!entryName.startsWith("META-INF")) {
+				assertTrue(entry + " has wrong path",
+						ArrayUtils.contains(filenames, entryName));
+			}
+		}
 	}
 
 }
