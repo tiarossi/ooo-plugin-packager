@@ -237,15 +237,15 @@ public class UnoPackage {
             addDialogLibraryFile(pathInArchive, directory);
         } else {
             for (File child : directory.listFiles()) {
-            	if ((includes.length > 0) && !match(child, includes)) {
+            	String path = pathInArchive + child.getName();
+            	if ((includes.length > 0) && !match(path, includes)) {
             		System.out.println(child + " will be not included");
             		continue;
             	}
-            	if (match(child, excludes)) {
+            	if (match(path, excludes)) {
             		System.out.println(child + " will be excluded");
             		continue;
             	}
-            	String path = pathInArchive + child.getName();
             	if (child.isFile()) {
             		addContent(path, child);
             	} else {
@@ -255,19 +255,19 @@ public class UnoPackage {
         }
     }
     
-    private static boolean match(final File file, final String[] filePatterns) {
+    private static boolean match(final String filename, final String[] filePatterns) {
     	for (int i = 0; i < filePatterns.length; i++) {
-			if (match(file, filePatterns[i])) {
+			if (match(filename, filePatterns[i])) {
 				return true;
 			}
 		}
     	return false;
     }
     
-    private static boolean match(final File file, final String filePattern) {
+    private static boolean match(final String filename, final String filePattern) {
 		String pattern = StringUtils.replace(filePattern, "*", ".*");
 		pattern = StringUtils.replace(pattern, ".*.*/", ".*/");
-		return file.getPath().matches(pattern);
+		return filename.matches(pattern);
     }
 
     /**

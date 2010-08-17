@@ -135,13 +135,15 @@ public final class UnoPackageTest {
 	@Test
 	public void testAddDirectory() throws ZipException, IOException {
 		String[] includes = {};
-		String[] excludes = { "**/CVS" };
+		String[] excludes = { "CVS", "**/CVS", "README" };
 		pkg.addDirectory(tmpDir, includes, excludes);
 		List<File> files = pkg.getContainedFiles();
 		assertTrue("no files included", files.size() > 0);
 		for (File file : files) {
-			assertFalse(file + " should be excluded!",
-					"CVS".equals(file.getParentFile().getName()));
+			String dirname = file.getParentFile().getName();
+			String filename = file.getName();
+			assertFalse(file + " should be excluded!", dirname.equals("CVS")
+					|| filename.equals("README"));
 			log.info("contained file: " + file);
 		}
 		pkg.close();
