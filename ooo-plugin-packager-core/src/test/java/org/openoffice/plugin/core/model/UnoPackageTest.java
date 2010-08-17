@@ -43,9 +43,25 @@ import org.junit.*;
 public final class UnoPackageTest {
 	
 	private static final Logger log = Logger.getLogger(UnoPackage.class.getName());
+	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
 	
+	/**
+	 * Here we create a tmpdir with some files for testing.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@BeforeClass
+	public static void setUpTmpDir() throws IOException {
+		tmpDir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest" + System.currentTimeMillis());
+		assertTrue("can't create " + tmpDir, tmpDir.mkdir());
+		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
+		FileUtils.writeStringToFile(new File(tmpDir, "README"), "README for testing");
+		FileUtils.writeStringToFile(new File(tmpDir, "hello.properties"), "hello=world");
+		log.info(tmpDir + " with 2 files created");
+	}
+
 	/**
 	 * Creates a tmp file for testing.
 	 *
@@ -65,6 +81,17 @@ public final class UnoPackageTest {
 	public void tearDown() {
 		tmpFile.delete();
 		log.info(tmpFile + " is deleted.");
+	}
+	
+	/**
+	 * Here we delete the directory created for testing.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@AfterClass
+	public static void tearDownTmpDir() throws IOException {
+		FileUtils.deleteDirectory(tmpDir);
+		log.info(tmpDir + " is deleted.");
 	}
 
 	/**
@@ -86,13 +113,7 @@ public final class UnoPackageTest {
 	 */
 	@Test
 	public void testAddContent() throws IOException {
-		File tmpdir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest");
-		tmpdir.mkdir();
-		assertTrue(tmpdir + " is not a directory", tmpdir.isDirectory());
-		FileUtils.writeStringToFile(new File(tmpdir, "README"), "README for testing");
-		FileUtils.writeStringToFile(new File(tmpdir, "hello.properties"), "hello=world");
-		log.info(tmpdir + " with 2 files created");
-		pkg.addContent(tmpdir);
+		pkg.addContent(tmpDir);
 		List<File> files = pkg.getContainedFiles();
 		assertEquals(2, files.size());
 		pkg.close();
