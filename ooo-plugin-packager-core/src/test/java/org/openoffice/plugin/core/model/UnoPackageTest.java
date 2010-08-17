@@ -24,11 +24,11 @@
 
 package org.openoffice.plugin.core.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -45,6 +45,7 @@ import org.junit.*;
 public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
+	private static final String[] filenames = { "README", "hello.properties", "CVS/Root"};
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
@@ -59,9 +60,10 @@ public final class UnoPackageTest {
 		tmpDir = new File(System.getProperty("java.io.tmpdir", "/tmp"), "oxttest" + System.currentTimeMillis());
 		assertTrue("can't create " + tmpDir, tmpDir.mkdir());
 		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
-		FileUtils.writeStringToFile(new File(tmpDir, "README"), "README for testing");
-		FileUtils.writeStringToFile(new File(tmpDir, "hello.properties"), "hello=world");
-		log.info(tmpDir + " with 2 files created");
+		for (int i = 0; i < filenames.length; i++) {
+			FileUtils.writeStringToFile(new File(tmpDir, filenames[i]), filenames[i] + " created at " + new Date());
+		}
+		log.info(tmpDir + " with " + filenames.length + " files created");
 	}
 
 	/**
@@ -117,7 +119,25 @@ public final class UnoPackageTest {
 	public void testAddContent() throws IOException {
 		pkg.addContent(tmpDir);
 		List<File> files = pkg.getContainedFiles();
-		assertEquals(2, files.size());
+		assertEquals(filenames.length, files.size());
+		pkg.close();
+	}
+	
+	/**
+	 * Here we exclude all CVS files and check it if they are really excluded.
+	 */
+	@Test
+	public void testAddDirectory() {
+		String[] includes = {};
+		String[] excludes = { "**/CVS" };
+		pkg.addDirectory(tmpDir, includes, excludes);
+		List<File> files = pkg.getContainedFiles();
+		assertTrue("no files included", files.size() > 0);
+		for (File file : files) {
+			assertFalse(file + " should be excluded!",
+					"CVS".equals(file.getParentFile().getName()));
+			log.info("contained file: " + file);
+		}
 		pkg.close();
 	}
 

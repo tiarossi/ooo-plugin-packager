@@ -46,14 +46,11 @@ package org.openoffice.plugin.core.model;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.FileHelper;
 import org.openoffice.plugin.core.utils.ZipContent;
 
@@ -229,7 +226,42 @@ public class UnoPackage {
      */
     public void addDirectory(File directory, String[] includes, String[] excludes) {
     	assert directory.isDirectory();
-    	this.addContent(directory);
+    	if (includes.length > 0) {
+			System.out.println("WARN: includes \"" + includes[0]
+					+ "\", ... will be ignored (not yet implemented");
+    	}
+        if (isBasicLibrary(directory)) {
+            addBasicLibraryFile(directory);
+        } else if (isDialogLibrary(directory)) {
+            addDialogLibraryFile(directory);
+        } else {
+            for (File child : directory.listFiles()) {
+            	if (match(child, excludes)) {
+            		System.out.println(child + " will be excluded");
+            		continue;
+            	}
+            	if (child.isFile()) {
+            		addContent(child.getName(), child);
+            	} else {
+            		addDirectory(child, includes, excludes);
+            	}
+            }
+        }
+    }
+    
+    private static boolean match(final File file, final String[] filePatterns) {
+    	for (int i = 0; i < filePatterns.length; i++) {
+			if (match(file, filePatterns[i])) {
+				return true;
+			}
+		}
+    	return false;
+    }
+    
+    private static boolean match(final File file, final String filePattern) {
+		String pattern = StringUtils.replace(filePattern, "*", ".*");
+		pattern = StringUtils.replace(pattern, ".*.*/", ".*/");
+		return file.getPath().matches(pattern);
     }
 
     /**
@@ -296,6 +328,15 @@ public class UnoPackage {
         mManifest.addTypelibraryFile(pathInArchive, pType);
         addZipContent(pathInArchive, pFile);
     }
+    
+    /**
+     * Add a basic library to the package.
+     * 
+     * @param dir the directory of the basic library.
+     */
+    public void addBasicLibraryFile(File dir) {
+    	this.addBasicLibraryFile(null, dir);
+    }
 
     /**
      * Add a basic library to the package.
@@ -316,6 +357,15 @@ public class UnoPackage {
         addZipContent(pathInArchive, pDir);
     }
 
+    /**
+     * Add a dialog library to the package.
+     * 
+     * @param dir the directory of the dialog library.
+     */
+    public void addDialogLibraryFile(File dir) {
+    	this.addDialogLibraryFile(null, dir);
+    }
+    
     /**
      * Add a dialog library to the package.
      * 
