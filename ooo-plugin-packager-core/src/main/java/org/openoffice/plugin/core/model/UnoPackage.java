@@ -226,16 +226,16 @@ public class UnoPackage {
      */
     public void addDirectory(File directory, String[] includes, String[] excludes) {
     	assert directory.isDirectory();
-    	if (includes.length > 0) {
-			System.out.println("WARN: includes \"" + includes[0]
-					+ "\", ... will be ignored (not yet implemented");
-    	}
         if (isBasicLibrary(directory)) {
             addBasicLibraryFile(directory);
         } else if (isDialogLibrary(directory)) {
             addDialogLibraryFile(directory);
         } else {
             for (File child : directory.listFiles()) {
+            	if ((includes.length > 0) && !match(child, includes)) {
+            		System.out.println(child + " will be not included");
+            		continue;
+            	}
             	if (match(child, excludes)) {
             		System.out.println(child + " will be excluded");
             		continue;

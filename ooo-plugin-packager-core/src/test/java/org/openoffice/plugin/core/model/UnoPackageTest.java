@@ -45,7 +45,8 @@ import org.junit.*;
 public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
-	private static final String[] filenames = { "README", "hello.properties", "CVS/Root"};
+	private static final String[] filenames = { "README", "hello.properties",
+			"CVS/Root", "de/helau.properties", "de/CVS/Root" };
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
