@@ -24,14 +24,16 @@
 
 package org.openoffice.plugin.core.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.*;
 
 /**
@@ -42,7 +44,7 @@ import org.junit.*;
  */
 public final class UnoPackageTest {
 	
-	private static final Logger log = Logger.getLogger(UnoPackage.class.getName());
+	private static final Log log = LogFactory.getLog(UnoPackage.class);
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;

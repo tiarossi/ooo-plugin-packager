@@ -219,6 +219,18 @@ public class UnoPackage {
     public void addContent(File file) {
     	this.addContent(null, file);
     }
+    
+    /**
+     * Adds the directory.
+     *
+     * @param directory the directory
+     * @param includes the includes
+     * @param excludes the excludes
+     */
+    public void addDirectory(File directory, String[] includes, String[] excludes) {
+    	assert directory.isDirectory();
+    	this.addContent(directory);
+    }
 
     /**
      * Add a uno component file, for example a jar, shared library or python
