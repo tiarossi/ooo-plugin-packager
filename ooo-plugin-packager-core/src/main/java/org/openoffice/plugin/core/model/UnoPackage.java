@@ -226,29 +226,7 @@ public class UnoPackage {
      */
 	public void addDirectory(final File directory, final String[] includes,
 			final String[] excludes) {
-    	assert directory.isDirectory();
-        if (isBasicLibrary(directory)) {
-            addBasicLibraryFile(directory);
-        } else if (isDialogLibrary(directory)) {
-            addDialogLibraryFile(directory);
-        } else {
-            for (File child : directory.listFiles()) {
-            	if ((includes.length > 0) && !match(child, includes)) {
-            		System.out.println(child + " will be not included");
-            		continue;
-            	}
-            	if (match(child, excludes)) {
-            		System.out.println(child + " will be excluded");
-            		continue;
-            	}
-            	String path = child.getName();
-            	if (child.isFile()) {
-            		addContent(path, child);
-            	} else {
-            		addDirectory(path + "/", child, includes, excludes);
-            	}
-            }
-        }
+		addDirectory("", directory, includes, excludes);
     }
     
     private void addDirectory(final String pathInArchive, final File directory, final String[] includes, final String[] excludes) {
