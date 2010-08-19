@@ -45,8 +45,13 @@ package org.openoffice.plugin.core.model;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
@@ -85,7 +90,6 @@ public class UnoPackage {
     private ArrayList<File> mToClean = new ArrayList<File>();
 
     private File mReadManifestFile;
-    private File mSaveManifestFile;
 
     /**
      * Create a new package object.
@@ -159,16 +163,6 @@ public class UnoPackage {
     public void setReadManifestFile(File pFile) {
         if (pFile != null && pFile.exists()) {
             mReadManifestFile = pFile;
-        }
-    }
-
-    /**
-     * @param pFile
-     *            the file where to save the manifest.xml
-     */
-    public void setSaveManifestFile(File pFile) {
-        if (pFile != null) {
-            mSaveManifestFile = pFile;
         }
     }
 
@@ -476,11 +470,8 @@ public class UnoPackage {
             try {
                 File manifestFile = mReadManifestFile;
                 if (manifestFile == null) {
-                    // Write the manifest if it doesn't exist
-                    manifestFile = getSaveManifestFile();
-                    FileOutputStream writer = new FileOutputStream(manifestFile);
-                    mManifest.write(writer);
-                    writer.close();
+                    manifestFile = createManifestFile();
+                    this.addToClean(manifestFile);
                 }
 
                 // Write the ZipContent
@@ -512,6 +503,17 @@ public class UnoPackage {
             dispose();
         }
         return result;
+    }
+    
+    private File createManifestFile() throws IOException {
+    	File manifest = new File(System.getProperty("java.io.tmpdir"), MANIFEST_PATH);
+    	if (manifest.exists()) {
+    		throw new IOException("don't risk to overwrite " + manifest.getAbsolutePath());
+    	}
+        FileOutputStream writer = new FileOutputStream(manifest);
+        mManifest.write(writer);
+        writer.close();
+    	return manifest;
     }
 
     /**
@@ -582,15 +584,6 @@ public class UnoPackage {
         for (File file : mToClean) {
             FileHelper.remove(file);
         }
-
-        // Remove the default manifest file if needed
-        File manifestFile = getSaveManifestFile();
-        if (mSaveManifestFile == null && !manifestFile.equals(mReadManifestFile) && manifestFile.exists()) {
-            try {
-                manifestFile.delete();
-            } catch (Exception e) {
-            }
-        }
     }
 
     /**
@@ -627,15 +620,15 @@ public class UnoPackage {
         return result;
     }
 
-    /**
-     * @return the manifest file to write either defined by the setter or the
-     *         default value.
-     */
-    private File getSaveManifestFile() {
-        File file = mSaveManifestFile;
-        if (file == null) {
-            file = new File(MANIFEST_PATH);
-        }
-        return file;
-    }
+//    /**
+//     * @return the manifest file to write either defined by the setter or the
+//     *         default value.
+//     */
+//    private File getSaveManifestFile() {
+//        File file = mSaveManifestFile;
+//        if (file == null) {
+//            file = new File(MANIFEST_PATH);
+//        }
+//        return file;
+//    }
 }

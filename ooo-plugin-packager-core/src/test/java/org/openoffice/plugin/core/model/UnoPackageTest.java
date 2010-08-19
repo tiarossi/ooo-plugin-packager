@@ -150,18 +150,42 @@ public final class UnoPackageTest {
 		checkUnoPackage();
 	}
 	
+	/**
+	 * The UnoPackage seems to delete an existing file "manifest.xml". This
+	 * test tries to reproduce it.
+	 * 
+	 * @throws ZipException the zip exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testCleanResources() throws ZipException, IOException {
+		File manifest = new File("manifest.xml");
+		assertFalse(manifest.getAbsolutePath(), manifest.exists());
+		FileUtils.writeStringToFile(manifest, "tempory created for testing");
+		assertTrue(manifest.getAbsolutePath(), manifest.exists());
+		pkg.addOtherFile("README", new File(tmpDir, "README"));
+		pkg.close();
+		assertTrue(manifest + " should be not deleted!", manifest.exists());
+		manifest.delete();
+		checkUnoPackage();
+	}
+	
 	private void checkUnoPackage() throws ZipException, IOException {
+		boolean hasManifest = false;
         ZipFile zip = new ZipFile(tmpFile);
         Enumeration<? extends ZipEntry> entries = zip.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
 			log.debug("entry: " + entry);
 			String entryName = entry.getName();
-			if (!entryName.startsWith("META-INF")) {
+			if (entryName.equals("META-INF/manifest.xml")) {
+				hasManifest = true;
+			} else {
 				assertTrue(entry + " has wrong path",
 						ArrayUtils.contains(filenames, entryName));
 			}
 		}
+		assertTrue("no manifest inside", hasManifest);
 	}
 
 }
