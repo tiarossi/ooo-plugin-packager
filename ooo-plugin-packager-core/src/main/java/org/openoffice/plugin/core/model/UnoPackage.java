@@ -176,25 +176,26 @@ public class UnoPackage {
      *            the file or folder to add
      */
     public void addContent(String pathInArchive, File pContent) {
+    	String pathname = FilenameUtils.normalize(pathInArchive);
         if (pContent.isFile()) {
             if (pContent.getName().endsWith(".xcs")) {
-                addConfigurationSchemaFile(pathInArchive, pContent);
+                addConfigurationSchemaFile(pathname, pContent);
             } else if (pContent.getName().endsWith(".xcu")) {
-                addConfigurationDataFile(pathInArchive, pContent);
+                addConfigurationDataFile(pathname, pContent);
             } else if (pContent.getName().endsWith(".rdb")) {
-                addTypelibraryFile(pathInArchive, pContent, "RDB");
+                addTypelibraryFile(pathname, pContent, "RDB");
             } else {
-                addOtherFile(pathInArchive, pContent);
+                addOtherFile(pathname, pContent);
             }
         } else if (pContent.isDirectory()) {
             if (isBasicLibrary(pContent)) {
-                addBasicLibraryFile(pathInArchive, pContent);
+                addBasicLibraryFile(pathname, pContent);
             } else if (isDialogLibrary(pContent)) {
-                addDialogLibraryFile(pathInArchive, pContent);
+                addDialogLibraryFile(pathname, pContent);
             } else {
                 // Recurse on the directory
                 for (File child : pContent.listFiles()) {
-                    addContent(new File(pathInArchive, child.getName()).getPath(), child);
+                    addContent(new File(pathname, child.getName()).getPath(), child);
                 }
             }
         } else {
@@ -238,14 +239,15 @@ public class UnoPackage {
     }
     
     private void addDirectory(final String pathInArchive, final File directory, final String[] includes, final String[] excludes) {
+    	String pathname = FilenameUtils.normalize(pathInArchive);
     	assert directory.isDirectory();
         if (isBasicLibrary(directory)) {
-            addBasicLibraryFile(pathInArchive, directory);
+            addBasicLibraryFile(pathname, directory);
         } else if (isDialogLibrary(directory)) {
-            addDialogLibraryFile(pathInArchive, directory);
+            addDialogLibraryFile(pathname, directory);
         } else {
             for (File child : directory.listFiles()) {
-            	String path = pathInArchive + child.getName();
+            	String path = pathname + child.getName();
             	if ((includes.length > 0) && !match(path, includes)) {
             		System.out.println(child + " will be not included");
             		continue;
@@ -542,6 +544,16 @@ public class UnoPackage {
             files.add(content.getFile());
         }
         return files;
+    }
+    
+    /**
+     * Gets the list of the names that are already queued for addition to the
+     *         package.
+     *
+     * @return the contained names
+     */
+    public List<String> getContainedNames() {
+    	return new ArrayList<String>(mZipEntries.keySet());
     }
 
     /**

@@ -131,6 +131,22 @@ public final class UnoPackageTest {
 	}
 	
 	/**
+	 * A file added as "test//README" should be added as "test/README".
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testAddContentNotNormalized() throws IOException {
+		pkg.addContent("test//README", new File(tmpDir + "//README"));
+		List<File> files = pkg.getContainedFiles();
+		assertEquals(1, files.size());
+		assertEquals(new File(tmpDir, "README"), files.get(0));
+		List<String> names = pkg.getContainedNames();
+		assertEquals(1, names.size());
+		assertEquals("test/README", names.get(0));
+	}
+	
+	/**
 	 * Here we exclude all CVS files and check it if they are really excluded.
 	 *
 	 * @throws ZipException the zip exception
@@ -201,7 +217,7 @@ public final class UnoPackageTest {
             zip.close();
         }
     }
-
+    
     private void checkUnoPackage() throws ZipException, IOException {
 		boolean hasManifest = false;
         ZipFile zip = new ZipFile(tmpFile);
