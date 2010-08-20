@@ -212,6 +212,20 @@ public class UnoPackage {
     }
     
     /**
+     * This method was added for symmetric reason because of the other
+     * addDirectory(..) methods.
+     * 
+     * @param directory the directory
+     * @see #addDirectory(File, String[], String[])
+     */
+    public void addDirectory(final File directory) {
+    	if (!directory.isDirectory()) {
+    		throw new IllegalArgumentException(directory + " is not a directory!");
+    	}
+    	this.addContent(directory);
+    }
+
+    /**
      * Adds the directory.
      *
      * @param directory the directory
@@ -468,12 +482,6 @@ public class UnoPackage {
 
         if (mBuilding) {
             try {
-                File manifestFile = mReadManifestFile;
-                if (manifestFile == null) {
-                    manifestFile = createManifestFile();
-                    this.addToClean(manifestFile);
-                }
-
                 // Write the ZipContent
                 FileOutputStream out = new FileOutputStream(mDestination);
                 ZipOutputStream zipOut = new ZipOutputStream(out);
@@ -484,9 +492,16 @@ public class UnoPackage {
                     content.writeContentToZip(zipOut);
                 }
 
-                // Add the manifest to the zip
-                ZipContent manifest = new ZipContent("META-INF/manifest.xml", manifestFile);
-                manifest.writeContentToZip(zipOut);
+                // Add the manifest to the zip (if not already inside)
+                if (!mZipEntries.containsKey("META-INF/manifest.xml")) {
+                    File manifestFile = mReadManifestFile;
+                    if (manifestFile == null) {
+                        manifestFile = createManifestFile();
+                        this.addToClean(manifestFile);
+                    }
+	                ZipContent manifest = new ZipContent("META-INF/manifest.xml", manifestFile);
+	                manifest.writeContentToZip(zipOut);
+                }
 
                 // close the streams
                 zipOut.close();
@@ -508,7 +523,8 @@ public class UnoPackage {
     private File createManifestFile() throws IOException {
     	File manifest = new File(System.getProperty("java.io.tmpdir"), MANIFEST_PATH);
     	if (manifest.exists()) {
-    		throw new IOException("don't risk to overwrite " + manifest.getAbsolutePath());
+			throw new IOException("I don't risk to overwrite "
+					+ manifest.getAbsolutePath() + " - please delete it!");
     	}
         FileOutputStream writer = new FileOutputStream(manifest);
         mManifest.write(writer);

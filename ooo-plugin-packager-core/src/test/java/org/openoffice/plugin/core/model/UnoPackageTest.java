@@ -26,12 +26,12 @@ package org.openoffice.plugin.core.model;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,9 +63,13 @@ public final class UnoPackageTest {
 		assertTrue("can't create " + tmpDir, tmpDir.mkdir());
 		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
 		for (int i = 0; i < filenames.length; i++) {
-			FileUtils.writeStringToFile(new File(tmpDir, filenames[i]), filenames[i] + " created at " + new Date());
+			addToTmpDir(filenames[i], filenames[i] + " created at " + new Date());
 		}
 		log.info(tmpDir + " with " + filenames.length + " files created");
+	}
+	
+	private static void addToTmpDir(final String filename, final String content) throws IOException {
+		FileUtils.writeStringToFile(new File(tmpDir, filename), content);
 	}
 
 	/**
@@ -170,7 +174,35 @@ public final class UnoPackageTest {
 		checkUnoPackage();
 	}
 	
-	private void checkUnoPackage() throws ZipException, IOException {
+    /**
+     * Test manifest recognition. If there is already a manifest file available
+     * this one should be used.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+	@Test
+    public void testManifestRecognition() throws IOException {
+        String manifestContent = "<Test-Manifest/>";
+        addToTmpDir("META-INF/manifest.xml", manifestContent);
+        pkg.addDirectory(tmpDir);
+        pkg.close();
+        checkUnoPackage();
+        String content = getManifestContent();
+        assertEquals(manifestContent, content);
+    }
+
+    private String getManifestContent() throws ZipException, IOException {
+        ZipFile zip = new ZipFile(tmpFile);
+        try {
+            ZipEntry entry = zip.getEntry("META-INF/manifest.xml");
+            InputStream istream = zip.getInputStream(entry);
+            return IOUtils.toString(istream);
+        } finally {
+            zip.close();
+        }
+    }
+
+    private void checkUnoPackage() throws ZipException, IOException {
 		boolean hasManifest = false;
         ZipFile zip = new ZipFile(tmpFile);
         Enumeration<? extends ZipEntry> entries = zip.entries();
