@@ -47,7 +47,8 @@ public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
 	private static final String[] filenames = { "README", "hello.properties",
-			"CVS/Root", "de/helau.properties", "de/CVS/Root" };
+			"CVS/Root", "de/helau.properties", "de/CVS/Root",
+			"config/Addon.xcu", "lib/main.jar" };
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
@@ -206,6 +207,23 @@ public final class UnoPackageTest {
         String content = getManifestContent();
         assertEquals(manifestContent, content);
     }
+	
+	/**
+	 * Here we test the generated manifest.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testGeneratedManifest() throws IOException {
+		File metaInfDir = new File(tmpDir, "META-INF");
+		FileUtils.deleteDirectory(metaInfDir);
+        pkg.addDirectory(tmpDir);
+		pkg.close();
+		String manifest = getManifestContent();
+		log.info("manifest.xml:\n" + manifest);
+		assertTrue("Addon.xcu not found in manifest.xml", manifest.contains("Addon.xcu"));
+		assertTrue("main.jar not found in manifest.xml", manifest.contains("main.jar"));
+	}
 
     private String getManifestContent() throws ZipException, IOException {
         ZipFile zip = new ZipFile(tmpFile);
