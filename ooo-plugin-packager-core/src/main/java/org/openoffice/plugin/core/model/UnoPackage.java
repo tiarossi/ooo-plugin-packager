@@ -167,6 +167,15 @@ public class UnoPackage {
     }
 
     /**
+     * Adds the content of the given (root) file or directory.
+     *
+     * @param file the file
+     */
+    public void addContent(File file) {
+    	this.addContent("", file);
+    }
+
+    /**
      * Add a file or directory to the package.
      * 
      * <p>This method doesn't know about the different languages contributions
@@ -176,41 +185,36 @@ public class UnoPackage {
      *            the file or folder to add
      */
     public void addContent(String pathInArchive, File pContent) {
-    	String pathname = FilenameUtils.normalize(pathInArchive);
+    	String pathname = pathInArchive == null ? "" : FilenameUtils.normalize(pathInArchive);
         if (pContent.isFile()) {
-            if (pContent.getName().endsWith(".xcs")) {
-                addConfigurationSchemaFile(pathname, pContent);
-            } else if (pContent.getName().endsWith(".xcu")) {
-                addConfigurationDataFile(pathname, pContent);
-            } else if (pContent.getName().endsWith(".rdb")) {
-                addTypelibraryFile(pathname, pContent, "RDB");
-            } else {
-                addOtherFile(pathname, pContent);
-            }
+            this.addFile(pathname, pContent);
         } else if (pContent.isDirectory()) {
-            if (isBasicLibrary(pContent)) {
-                addBasicLibraryFile(pathname, pContent);
-            } else if (isDialogLibrary(pContent)) {
-                addDialogLibraryFile(pathname, pContent);
-            } else {
-                // Recurse on the directory
-                for (File child : pContent.listFiles()) {
-                    addContent(new File(pathname, child.getName()).getPath(), child);
-                }
-            }
+        	this.addDirectory(pathname, pContent);
         } else {
             throw new IllegalArgumentException("pContent [" + pContent + "] does not exists");
         }
     }
-    
-    /**
-     * Adds the content of the given (root) file or directory.
-     *
-     * @param file the file
-     */
-    public void addContent(File file) {
-    	this.addContent(null, file);
-    }
+
+	/**
+	 * Add a file to the package.
+	 * 
+     * <p>This method doesn't know about the different languages contributions
+     * to the <code>manifest.xml</code> file.</p>
+	 *
+	 * @param pathname the pathname inside the package
+	 * @param pContent the content
+	 */
+	public void addFile(String pathname, File pContent) {
+		if (pContent.getName().endsWith(".xcs")) {
+		    addConfigurationSchemaFile(pathname, pContent);
+		} else if (pContent.getName().endsWith(".xcu")) {
+		    addConfigurationDataFile(pathname, pContent);
+		} else if (pContent.getName().endsWith(".rdb")) {
+		    addTypelibraryFile(pathname, pContent, "RDB");
+		} else {
+		    addOtherFile(pathname, pContent);
+		}
+	}
     
     /**
      * This method was added for symmetric reason because of the other
@@ -220,10 +224,20 @@ public class UnoPackage {
      * @see #addDirectory(File, String[], String[])
      */
     public void addDirectory(final File directory) {
+    	this.addDirectory("", directory);
+    }
+    
+    /**
+     * Adds the directory.
+     *
+     * @param pathInArchive the path in archive
+     * @param directory the directory
+     */
+    public void addDirectory(final String pathInArchive, final File directory) {
     	if (!directory.isDirectory()) {
     		throw new IllegalArgumentException(directory + " is not a directory!");
     	}
-    	this.addContent(directory);
+    	this.addDirectory(pathInArchive, directory, new String[0], new String[0]);
     }
 
     /**
@@ -247,7 +261,7 @@ public class UnoPackage {
             addDialogLibraryFile(pathname, directory);
         } else {
             for (File child : directory.listFiles()) {
-            	String path = pathname + child.getName();
+            	String path = FilenameUtils.normalize(pathname + child.getName());
             	if ((includes.length > 0) && !match(path, includes)) {
             		System.out.println(child + " will be not included");
             		continue;
