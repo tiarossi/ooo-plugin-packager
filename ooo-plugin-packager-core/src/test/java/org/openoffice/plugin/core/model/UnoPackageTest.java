@@ -47,7 +47,7 @@ public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
 	private static final String[] filenames = { "README", "hello.properties",
-			"CVS/Root", "de/helau.properties", "de/CVS/Root",
+			"CVS/Root", "de/dialog.xlb", "de/CVS/Root", "de/CVS/Templates",
 			"config/Addon.xcu", "lib/main.jar" };
 	private static File tmpDir;
 	private File tmpFile;

@@ -258,27 +258,34 @@ public class UnoPackage {
     	String pathname = FilenameUtils.normalize(pathInArchive);
     	assert directory.isDirectory();
         if (isBasicLibrary(directory)) {
-            addBasicLibraryFile(pathname, directory);
+            addBasicLibraryFile(pathname, directory, includes, excludes);
         } else if (isDialogLibrary(directory)) {
-            addDialogLibraryFile(pathname, directory);
+            addDialogLibraryFile(pathname, directory, includes, excludes);
         } else {
             for (File child : directory.listFiles()) {
             	String path = FilenameUtils.normalize(pathname + child.getName());
-            	if ((includes.length > 0) && !match(path, includes)) {
-            		System.out.println(child + " will be not included");
-            		continue;
-            	}
-            	if (match(path, excludes)) {
-            		System.out.println(child + " will be excluded");
+            	if (shouldBeExcluded(path, includes, excludes)) {
             		continue;
             	}
             	if (child.isFile()) {
-            		addContent(path, child);
+            		addFile(path, child);
             	} else {
             		addDirectory(path + "/", child, includes, excludes);
             	}
             }
         }
+    }
+    
+    private static boolean shouldBeExcluded(final String path, final String[] includes, final String[] excludes) {
+    	if ((includes.length > 0) && !match(path, includes)) {
+    		System.out.println(path + " will be not included");
+    		return true;
+    	}
+    	if (match(path, excludes)) {
+    		System.out.println(path + " will be excluded");
+    		return true;
+    	}
+    	return false;
     }
     
     private static boolean match(final String filename, final String[] filePatterns) {
@@ -379,6 +386,21 @@ public class UnoPackage {
      *            the directory of the basic library.
      */
     public void addBasicLibraryFile(String pathInArchive, File pDir) {
+        this.addBasicLibraryFile(pathInArchive, pDir, new String[0], new String[0]);
+    }
+
+    /**
+     * Add a basic library to the package.
+     * 
+     * <p>Even if this method may not be used, it is possible.</p>
+     *
+     * @param pathInArchive the path in archive
+     * @param pDir the directory of the basic library.
+     * @param includes the includes
+     * @param excludes the excludes
+     */
+	public void addBasicLibraryFile(String pathInArchive, File pDir,
+			String[] includes, String[] excludes) {
         if (!pDir.isDirectory())
             throw new IllegalArgumentException("pDir [" + pDir + "] is not a folder");
 
@@ -386,7 +408,7 @@ public class UnoPackage {
         initializeOutput();
 
         mManifest.addBasicLibrary(pathInArchive);
-        addZipContent(pathInArchive, pDir);
+        addZipContent(pathInArchive, pDir, includes, excludes);
     }
 
     /**
@@ -415,6 +437,28 @@ public class UnoPackage {
 
         mManifest.addDialogLibrary(pathInArchive);
         addZipContent(pathInArchive, pDir);
+    }
+
+    /**
+     * Add a dialog library to the package.
+     * 
+     * <p>Even if this method may not be used, it is possible.</p>
+     *
+     * @param pathInArchive the path in archive
+     * @param pDir the directory of the dialog library.
+     * @param includes the includes
+     * @param excludes the excludes
+     */
+    public void addDialogLibraryFile(String pathInArchive, File pDir,
+			String[] includes, String[] excludes) {
+        if (!pDir.isDirectory())
+            throw new IllegalArgumentException("pDir [" + pDir + "] is not a folder");
+
+        // Do not change the extension from now
+        initializeOutput();
+
+        mManifest.addDialogLibrary(pathInArchive);
+        addZipContent(pathInArchive, pDir, includes, excludes);
     }
 
     /**
@@ -603,13 +647,31 @@ public class UnoPackage {
      *            the file or directory to add
      */
     private void addZipContent(String pRelativePath, File pFile) {
+    	addZipContent(pRelativePath, pFile, new String[0], new String[0]);
+    }
+
+    /**
+     * Recursively add the file or directory to the Zip entries.
+     *
+     * @param pRelativePath the relative path of the file to add
+     * @param pFile the file or directory to add
+     * @param includes the includes
+     * @param excludes the excludes
+     */
+	private void addZipContent(String pRelativePath, File pFile,
+			String[] includes, String[] excludes) {
         if (pRelativePath != null) {
             if (pFile.isDirectory()) {
                 // Add all the children
                 try {
-                    for (File child : pFile.listFiles()) {
-                        addZipContent(pRelativePath + "/" + child.getName(), child);
-                    }
+					for (File child : pFile.listFiles()) {
+						String path = FilenameUtils.normalize(pRelativePath
+								+ "/" + child.getName());
+						if (shouldBeExcluded(path, includes, excludes)) {
+							continue;
+						}
+						addZipContent(path, child);
+					}
                 } catch (Exception e) {
                 }
             } else {
