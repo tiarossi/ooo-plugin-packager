@@ -213,6 +213,8 @@ public class UnoPackage {
 		    addTypelibraryFile(pathname, pContent, "RDB");
 		} else if (pContent.getName().endsWith(".jar")) {
 			addTypelibraryFile(pathname, pContent, "Java");
+		} else if (pContent.getName().equals("description.xml")) {
+			addPackageDescription(pathname, pContent, Locale.getDefault());
 		} else {
 		    addOtherFile(pathname, pContent);
 		}

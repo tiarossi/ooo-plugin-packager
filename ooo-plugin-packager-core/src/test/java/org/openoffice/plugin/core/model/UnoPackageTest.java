@@ -48,7 +48,7 @@ public final class UnoPackageTest {
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
 	private static final String[] filenames = { "README", "hello.properties",
 			"CVS/Root", "de/dialog.xlb", "de/CVS/Root", "de/CVS/Templates",
-			"config/Addon.xcu", "lib/main.jar" };
+			"config/Addon.xcu", "lib/main.jar", "description.xml" };
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
@@ -223,6 +223,8 @@ public final class UnoPackageTest {
 		log.info("manifest.xml:\n" + manifest);
 		assertTrue("Addon.xcu not found in manifest.xml", manifest.contains("Addon.xcu"));
 		assertTrue("main.jar not found in manifest.xml", manifest.contains("main.jar"));
+		assertTrue("description.xml not found in manifest.xml",
+				manifest.contains("description.xml"));
 	}
 
     private String getManifestContent() throws ZipException, IOException {
