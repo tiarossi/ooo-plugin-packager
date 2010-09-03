@@ -144,7 +144,7 @@ public final class UnoPackageTest {
 		assertEquals(new File(tmpDir, "README"), files.get(0));
 		List<String> names = pkg.getContainedNames();
 		assertEquals(1, names.size());
-		assertEquals("test/README", names.get(0));
+		assertEquals(new File("test", "README").toString(), names.get(0));
 	}
 	
 	/**

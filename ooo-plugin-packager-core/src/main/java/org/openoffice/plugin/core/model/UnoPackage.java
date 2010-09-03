@@ -302,7 +302,7 @@ public class UnoPackage {
     private static boolean match(final String filename, final String filePattern) {
 		String pattern = StringUtils.replace(filePattern, "*", ".*");
 		pattern = StringUtils.replace(pattern, ".*.*/", ".*/");
-		return filename.matches(pattern);
+		return FilenameUtils.separatorsToUnix(filename).matches(pattern);
     }
 
     /**
