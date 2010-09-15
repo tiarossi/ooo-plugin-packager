@@ -57,6 +57,19 @@ import java.io.IOException;
 public class FileHelper {
 
     /**
+     * Converts all separators to the Unix separator of forward slash.
+     * 
+     * @param path  the path to be changed, null ignored
+     * @return the updated path
+     */
+    public static String separatorsToUnix(String path) {
+        if (path == null || path.indexOf('/') == -1) {
+            return path;
+        }
+        return path.replace('\\', '/');
+    }
+	
+    /**
      * Moves the src directory or file to the dst container.
      * 
      * @param pSrc

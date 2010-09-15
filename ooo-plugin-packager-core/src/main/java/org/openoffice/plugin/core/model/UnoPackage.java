@@ -46,10 +46,13 @@ package org.openoffice.plugin.core.model;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.InvalidParameterException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.FileHelper;
 import org.openoffice.plugin.core.utils.ZipContent;
@@ -97,8 +100,6 @@ public class UnoPackage {
      * 
      * @param pOut
      *            the file of the package.
-     * @param pPrj
-     *            the project to export
      */
     public UnoPackage(File pOut) {
         File dest = pOut;
@@ -319,6 +320,7 @@ public class UnoPackage {
      * <p>Note that by some strange way, a jar dependency can be added in the
      * package as a type library like RDB files.</p>
      * 
+     * @param pathInArchive the path in the Zip archive
      * @param pFile
      *            the file to add
      * @param pType
@@ -567,7 +569,7 @@ public class UnoPackage {
                 } catch (Exception e) {
                 }
             } else {
-                String zipPath = FilenameUtils.separatorsToUnix(pRelativePath);
+                String zipPath = FileHelper.separatorsToUnix(pRelativePath);
                 System.out.println("Adding " + zipPath + " to oxt package");
                 ZipContent content = new ZipContent(zipPath, pFile);
                 mZipEntries.put(pRelativePath, content);
