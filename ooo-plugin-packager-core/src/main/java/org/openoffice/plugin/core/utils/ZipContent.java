@@ -107,7 +107,7 @@ public class ZipContent {
             pOutput.closeEntry();
             
         } catch (IOException e) {
-            System.err.println("Problem when writing file to zip: " + mEntryName);
+            System.err.println("Problem when writing file to zip: " + mEntryName + " (" + e.getLocalizedMessage() + ")");
         } finally {
             // Close the file entry stream
             try { 

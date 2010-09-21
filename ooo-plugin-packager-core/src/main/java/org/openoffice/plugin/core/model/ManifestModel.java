@@ -70,6 +70,8 @@ public class ManifestModel {
                 addConfigurationDataFile(path);
             } else if (pContent.getName().endsWith(EXT_RDB)) {
                 addTypelibraryFile(path, "RDB");
+            } else if (pContent.getName().equals("description.xml")) {
+            	addDescription(path, Locale.getDefault());
             }
         } else if (pContent.isDirectory()) {
             // Recurse on the directory

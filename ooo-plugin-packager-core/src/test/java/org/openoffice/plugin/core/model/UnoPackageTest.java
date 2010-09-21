@@ -26,12 +26,12 @@ package org.openoffice.plugin.core.model;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,7 +47,8 @@ public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackage.class);
 	private static final String[] filenames = { "README", "hello.properties",
-			"CVS/Root", "de/helau.properties", "de/CVS/Root" };
+			"CVS/Root", "de/dialog.xlb", "de/CVS/Root", "de/CVS/Templates",
+			"config/Addon.xcu", "lib/main.jar", "description.xml" };
 	private static File tmpDir;
 	private File tmpFile;
 	private UnoPackage pkg;
@@ -63,9 +64,13 @@ public final class UnoPackageTest {
 		assertTrue("can't create " + tmpDir, tmpDir.mkdir());
 		assertTrue(tmpDir + " is not a directory", tmpDir.isDirectory());
 		for (int i = 0; i < filenames.length; i++) {
-			FileUtils.writeStringToFile(new File(tmpDir, filenames[i]), filenames[i] + " created at " + new Date());
+			addToTmpDir(filenames[i], filenames[i] + " created at " + new Date());
 		}
 		log.info(tmpDir + " with " + filenames.length + " files created");
+	}
+	
+	private static void addToTmpDir(final String filename, final String content) throws IOException {
+		FileUtils.writeStringToFile(new File(tmpDir, filename), content);
 	}
 
 	/**
@@ -127,6 +132,22 @@ public final class UnoPackageTest {
 	}
 	
 	/**
+	 * A file added as "test//README" should be added as "test/README".
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testAddContentNotNormalized() throws IOException {
+		pkg.addContent("test//README", new File(tmpDir + "//README"));
+		List<File> files = pkg.getContainedFiles();
+		assertEquals(1, files.size());
+		assertEquals(new File(tmpDir, "README"), files.get(0));
+		List<String> names = pkg.getContainedNames();
+		assertEquals(1, names.size());
+		assertEquals(new File("test", "README").toString(), names.get(0));
+	}
+	
+	/**
 	 * Here we exclude all CVS files and check it if they are really excluded.
 	 *
 	 * @throws ZipException the zip exception
@@ -150,18 +171,89 @@ public final class UnoPackageTest {
 		checkUnoPackage();
 	}
 	
-	private void checkUnoPackage() throws ZipException, IOException {
+	/**
+	 * The UnoPackage seems to delete an existing file "manifest.xml". This
+	 * test tries to reproduce it.
+	 * 
+	 * @throws ZipException the zip exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testCleanResources() throws ZipException, IOException {
+		File manifest = new File("manifest.xml");
+		assertFalse(manifest.getAbsolutePath(), manifest.exists());
+		FileUtils.writeStringToFile(manifest, "tempory created for testing");
+		assertTrue(manifest.getAbsolutePath(), manifest.exists());
+		pkg.addOtherFile("README", new File(tmpDir, "README"));
+		pkg.close();
+		assertTrue(manifest + " should be not deleted!", manifest.exists());
+		manifest.delete();
+		checkUnoPackage();
+	}
+	
+    /**
+     * Test manifest recognition. If there is already a manifest file available
+     * this one should be used.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+	@Test
+    public void testManifestRecognition() throws IOException {
+        String manifestContent = "<Test-Manifest/>";
+        addToTmpDir("META-INF/manifest.xml", manifestContent);
+        pkg.addDirectory(tmpDir);
+        pkg.close();
+        checkUnoPackage();
+        String content = getManifestContent();
+        assertEquals(manifestContent, content);
+    }
+	
+	/**
+	 * Here we test the generated manifest.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	@Test
+	public void testGeneratedManifest() throws IOException {
+		File metaInfDir = new File(tmpDir, "META-INF");
+		FileUtils.deleteDirectory(metaInfDir);
+        pkg.addDirectory(tmpDir);
+		pkg.close();
+		String manifest = getManifestContent();
+		log.info("manifest.xml:\n" + manifest);
+		assertTrue("Addon.xcu not found in manifest.xml", manifest.contains("Addon.xcu"));
+		assertTrue("main.jar not found in manifest.xml", manifest.contains("main.jar"));
+		assertTrue("description.xml not found in manifest.xml",
+				manifest.contains("description.xml"));
+	}
+
+    private String getManifestContent() throws ZipException, IOException {
+        ZipFile zip = new ZipFile(tmpFile);
+        try {
+            ZipEntry entry = zip.getEntry("META-INF/manifest.xml");
+            InputStream istream = zip.getInputStream(entry);
+            return IOUtils.toString(istream);
+        } finally {
+            zip.close();
+        }
+    }
+    
+    private void checkUnoPackage() throws ZipException, IOException {
+		boolean hasManifest = false;
         ZipFile zip = new ZipFile(tmpFile);
         Enumeration<? extends ZipEntry> entries = zip.entries();
 		while (entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
 			log.debug("entry: " + entry);
 			String entryName = entry.getName();
-			if (!entryName.startsWith("META-INF")) {
+			if (entryName.equals("META-INF/manifest.xml")) {
+				hasManifest = true;
+			} else {
 				assertTrue(entry + " has wrong path",
 						ArrayUtils.contains(filenames, entryName));
 			}
 		}
+		assertTrue("no manifest inside", hasManifest);
 	}
 
 }
