@@ -43,20 +43,13 @@
  ************************************************************************/
 package org.openoffice.plugin.core.model;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.StringUtils;
-import org.openoffice.plugin.core.utils.FileHelper;
-import org.openoffice.plugin.core.utils.ZipContent;
+import org.openoffice.plugin.core.utils.*;
 
 /**
  * This class represents a UNO package and should be used to create a UNO
