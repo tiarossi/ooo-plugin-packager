@@ -338,7 +338,9 @@ public class UnoPackage {
         // Do not change the extension from now
         initializeOutput();
 
-        mManifest.addComponentFile(pathInArchive, pType, pPlatform);
+        if (!hasRegistrationHandlerInside(pFile)) {
+        	mManifest.addComponentFile(pathInArchive, pType, pPlatform);
+        }
         addZipContent(pathInArchive, pFile);
     }
 
@@ -387,7 +389,9 @@ public class UnoPackage {
 				if (entry.isDirectory()) {
 					continue;
 				}
-				if (entry.getName().endsWith("RegistrationHandler.classes")) {
+				if (entry.getName().endsWith("RegistrationHandler.class")
+						|| entry.getName().endsWith(
+								"RegistrationHandler.classes")) {
 					return true;
 				}
 			}
