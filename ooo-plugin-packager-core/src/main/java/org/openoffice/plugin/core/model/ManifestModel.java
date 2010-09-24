@@ -249,7 +249,7 @@ public class ManifestModel {
      */
     public void write(OutputStream pOut) throws IOException {
         Iterator<Entry<String, FileType>> iter = mEntries.entrySet().iterator();
-        String entryPattern = "<manifest:file-entry manifest:full-path=\"{0}\"" +
+        String entryPattern = "\t<manifest:file-entry manifest:full-path=\"{0}\"" +
                 " manifest:media-type=\"{1}\"/>\n";
         pOut.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".getBytes());
         pOut.write("<manifest:manifest xmlns:manifest=\"http://openoffice.org/2001/manifest\">\n".getBytes());

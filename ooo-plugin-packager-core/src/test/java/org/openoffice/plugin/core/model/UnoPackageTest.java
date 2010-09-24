@@ -217,6 +217,9 @@ public final class UnoPackageTest {
 	public void testGeneratedManifest() throws IOException {
 		File metaInfDir = new File(tmpDir, "META-INF");
 		FileUtils.deleteDirectory(metaInfDir);
+		File worldJar = new File("src/test/resources/sample/OOHelloWorld.jar");
+		assertTrue(worldJar + " not found", worldJar.exists());
+		FileUtils.copyFileToDirectory(worldJar, tmpDir);
         pkg.addDirectory(tmpDir);
 		pkg.close();
 		String manifest = getManifestContent();
@@ -225,6 +228,9 @@ public final class UnoPackageTest {
 		assertTrue("main.jar not found in manifest.xml", manifest.contains("main.jar"));
 		assertTrue("description.xml not found in manifest.xml",
 				manifest.contains("description.xml"));
+		assertFalse(worldJar
+				+ " contains RegistrationHandler.class and should not appear",
+				manifest.contains(worldJar.getName()));
 	}
 
     private String getManifestContent() throws ZipException, IOException {
@@ -255,5 +261,15 @@ public final class UnoPackageTest {
 		}
 		assertTrue("no manifest inside", hasManifest);
 	}
+    
+    /**
+     * Test method for {@link UnoPackage#hasRegistrationHandlerInside(File)}.
+     */
+    @Test
+    public void testHasRegistrationHandlerInside() {
+		File worldJar = new File("src/test/resources/sample/OOHelloWorld.jar");
+		assertTrue(worldJar + " has RegistrationHandler.classes inside",
+				UnoPackage.hasRegistrationHandlerInside(worldJar));
+    }
 
 }

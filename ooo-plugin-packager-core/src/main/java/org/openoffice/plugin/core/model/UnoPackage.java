@@ -46,9 +46,13 @@ package org.openoffice.plugin.core.model;
 import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.openoffice.plugin.core.utils.*;
 
 /**
@@ -71,6 +75,7 @@ public class UnoPackage {
     public static final String UNOPKG = "uno.pkg";
     public static final String OXT = "oxt";
 
+    private static final Log log = LogFactory.getLog(UnoPackage.class);
     private static final String BASIC_LIBRARY_INDEX = "script.xlb";
     private static final String DIALOG_LIBRARY_INDEX = "dialog.xlb";
 
@@ -357,8 +362,40 @@ public class UnoPackage {
         // Do not change the extension from now
         initializeOutput();
 
-        mManifest.addTypelibraryFile(pathInArchive, pType);
+        if (!hasRegistrationHandlerInside(pFile)) {
+        	mManifest.addTypelibraryFile(pathInArchive, pType);
+        }
         addZipContent(pathInArchive, pFile);
+    }
+    
+    /**
+     * Here we look if a RegistrationHandler.class is inside the given
+     * jar file. In this case no entry is needed for the generated manifest
+     * file.
+     * <br/>
+     * This method has package default visibility for testing.
+     *
+     * @param file the jar file
+     * @return true, if successful
+     * @since 24-Sep-2010 (oliver.boehm@agentes.de)
+     */
+    static boolean hasRegistrationHandlerInside(final File file) {
+    	try {
+			JarFile jarFile = new JarFile(file);
+			Enumeration<JarEntry> entries = jarFile.entries();
+			while (entries.hasMoreElements()) {
+				JarEntry entry = entries.nextElement();
+				if (entry.isDirectory()) {
+					continue;
+				}
+				if (entry.getName().endsWith("RegistrationHandler.classes")) {
+					return true;
+				}
+			}
+		} catch (IOException ioe) {
+			log.warn("can't read " + file, ioe);
+		}
+    	return false;
     }
     
     /**
