@@ -45,7 +45,7 @@ import org.junit.*;
  */
 public final class UnoPackageTest {
 	
-	private static final Log log = LogFactory.getLog(UnoPackage.class);
+	private static final Log log = LogFactory.getLog(UnoPackageTest.class);
 	private static final String[] filenames = { "README", "hello.properties",
 			"CVS/Root", "de/dialog.xlb", "de/CVS/Root", "de/CVS/Templates",
 			"config/Addon.xcu", "lib/main.jar", "description.xml" };

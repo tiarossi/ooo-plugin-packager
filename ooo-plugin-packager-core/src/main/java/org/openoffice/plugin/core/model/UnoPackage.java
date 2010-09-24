@@ -48,11 +48,10 @@ import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openoffice.plugin.core.utils.*;
 
 /**
@@ -75,7 +74,7 @@ public class UnoPackage {
     public static final String UNOPKG = "uno.pkg";
     public static final String OXT = "oxt";
 
-    private static final Log log = LogFactory.getLog(UnoPackage.class);
+    private static final Logger log = Logger.getLogger(UnoPackage.class.getName());
     private static final String BASIC_LIBRARY_INDEX = "script.xlb";
     private static final String DIALOG_LIBRARY_INDEX = "dialog.xlb";
 
@@ -393,7 +392,7 @@ public class UnoPackage {
 				}
 			}
 		} catch (IOException ioe) {
-			log.warn("can't read " + file, ioe);
+			log.warning("can't read " + file + " (" + ioe + ")");
 		}
     	return false;
     }
