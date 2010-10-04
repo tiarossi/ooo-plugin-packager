@@ -554,9 +554,10 @@ public class UnoPackage {
      *            the file or directory to add.
      */
     public void addOtherFile(String pathInArchive, File pFile) {
-        if (!pFile.isFile())
-            throw new IllegalArgumentException("pFile [" + pFile + "] is not a file");
-
+        if (!pFile.isFile()) {
+			throw new IllegalArgumentException("pFile ["
+					+ pFile.getAbsolutePath() + "] is not a file");
+        }
         // Do not change the extension from now
         initializeOutput();
 
