@@ -228,9 +228,10 @@ public final class UnoPackageTest {
 		assertTrue("main.jar not found in manifest.xml", manifest.contains("main.jar"));
 		assertTrue("description.xml not found in manifest.xml",
 				manifest.contains("description.xml"));
-		assertFalse(worldJar
-				+ " contains RegistrationHandler.class and should not appear",
+		assertTrue(worldJar + " appear as 'uno-component'",
 				manifest.contains(worldJar.getName()));
+		String expectedManifest = getExpectedManifestContent();
+		assertEquals(expectedManifest, manifest);
 	}
 
     private String getManifestContent() throws ZipException, IOException {
@@ -242,6 +243,13 @@ public final class UnoPackageTest {
         } finally {
             zip.close();
         }
+    }
+    
+    private String getExpectedManifestContent() throws IOException {
+    	InputStream istream = UnoPackageTest.class.getResourceAsStream("manifest.xml");
+    	String content = IOUtils.toString(istream);
+    	istream.close();
+    	return content;
     }
     
     private void checkUnoPackage() throws ZipException, IOException {

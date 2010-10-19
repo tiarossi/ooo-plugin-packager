@@ -30,13 +30,9 @@
  ************************************************************************/
 package org.openoffice.plugin.core.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -236,6 +232,9 @@ public class ManifestModel {
     private void addEntry(String pRelativePath, FileType pType) {
         String path = pRelativePath;
         path = path.replace("\\", "/");
+        if (path.endsWith("/")) {
+        	path = path.substring(0, path.length() - 1);
+        }
         mEntries.put(path, pType);
     }
 
@@ -248,16 +247,39 @@ public class ManifestModel {
      *             if something happened when writing to the output stream
      */
     public void write(OutputStream pOut) throws IOException {
+//        Iterator<Entry<String, FileType>> iter = mEntries.entrySet().iterator();
+//        String entryPattern = "\t<manifest:file-entry manifest:full-path=\"{0}\"" +
+//                " manifest:media-type=\"{1}\"/>\n";
+//        pOut.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".getBytes());
+//        pOut.write("<manifest:manifest xmlns:manifest=\"http://openoffice.org/2001/manifest\">\n".getBytes());
+//        while (iter.hasNext()) {
+//            Entry<String, FileType> entry = iter.next();
+//            pOut.write(MessageFormat.format(entryPattern, entry.getKey(), entry.getValue().toString()).getBytes());
+//        }
+//        pOut.write("</manifest:manifest>\n".getBytes());
+//        pOut.flush();
+    	write(new OutputStreamWriter(pOut));
+    	pOut.flush();
+    }
+    
+    /**
+     * Write the manifest file.
+     *
+     * @param writer the writer
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public void write(Writer writer) throws IOException {
         Iterator<Entry<String, FileType>> iter = mEntries.entrySet().iterator();
         String entryPattern = "\t<manifest:file-entry manifest:full-path=\"{0}\"" +
                 " manifest:media-type=\"{1}\"/>\n";
-        pOut.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n".getBytes());
-        pOut.write("<manifest:manifest xmlns:manifest=\"http://openoffice.org/2001/manifest\">\n".getBytes());
+        writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        writer.write("<manifest:manifest xmlns:manifest=\"http://openoffice.org/2001/manifest\">\n");
         while (iter.hasNext()) {
             Entry<String, FileType> entry = iter.next();
-            pOut.write(MessageFormat.format(entryPattern, entry.getKey(), entry.getValue().toString()).getBytes());
+            writer.write(MessageFormat.format(entryPattern, entry.getKey(), entry.getValue().toString()));
         }
-        pOut.write("</manifest:manifest>\n".getBytes());
-        pOut.flush();
+        writer.write("</manifest:manifest>\n");
+        writer.flush();
     }
+    
 }
