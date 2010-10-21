@@ -360,7 +360,7 @@ public class UnoPackage {
         // Do not change the extension from now
         initializeOutput();
 
-        if (hasRegistrationHandlerInside(pFile)) {
+        if ("Java".equalsIgnoreCase(pType) && hasRegistrationHandlerInside(pFile)) {
         	mManifest.addComponentFile(pathInArchive, pType);
         } else {
         	mManifest.addTypelibraryFile(pathInArchive, pType);
