@@ -63,6 +63,10 @@ import org.openoffice.plugin.core.utils.*;
  * package will have to be contained in this directory or one of its
  * children.</p>
  * 
+ * <p>For the different file types see 
+ * {@link "http://wiki.services.openoffice.org/wiki/Documentation/DevGuide/Extensions/File_Format"}.
+ * </p>
+ * 
  * @author cedricbosdo
  * 
  */
@@ -361,7 +365,10 @@ public class UnoPackage {
         initializeOutput();
 
         if ("Java".equalsIgnoreCase(pType) && hasRegistrationHandlerInside(pFile)) {
-        	mManifest.addComponentFile(pathInArchive, pType);
+//        	mManifest.addComponentFile(pathInArchive, pType);
+			log.fine(pathInArchive
+					+ " with RegistrationHandler will be added as uno-typelibrary");
+        	mManifest.addTypelibraryFile(pathInArchive, pType);
         } else {
         	mManifest.addTypelibraryFile(pathInArchive, pType);
         }
