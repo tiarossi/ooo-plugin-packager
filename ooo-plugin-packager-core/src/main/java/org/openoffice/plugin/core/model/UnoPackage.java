@@ -365,10 +365,7 @@ public class UnoPackage {
         initializeOutput();
 
         if ("Java".equalsIgnoreCase(pType) && hasRegistrationHandlerInside(pFile)) {
-//        	mManifest.addComponentFile(pathInArchive, pType);
-			log.fine(pathInArchive
-					+ " with RegistrationHandler will be added as uno-typelibrary");
-        	mManifest.addTypelibraryFile(pathInArchive, pType);
+        	mManifest.addComponentFile(pathInArchive, pType);
         } else {
         	mManifest.addTypelibraryFile(pathInArchive, pType);
         }
