@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.FileHelper;
 import org.openoffice.plugin.core.utils.ZipContent;
 
@@ -266,11 +265,11 @@ public class UnoPackage {
     }
     
     private static boolean match(final String filename, final String filePattern) {
-		String pattern = StringUtils.replace(filePattern, "*", ".*");
-		pattern = StringUtils.replace(pattern, ".*.*/", ".*/");
+		String pattern = filePattern.replace("*", ".*");
+		pattern = pattern.replace(".*.*/", ".*/");
 		return filename.matches(pattern);
     }
-
+    
     /**
      * Add a uno component file, for example a jar, shared library or python
      * file containing the uno implementation. The type of the file defines the
