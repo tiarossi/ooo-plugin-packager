@@ -51,7 +51,6 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.*;
 
 /**
@@ -298,11 +297,11 @@ public class UnoPackage {
     }
     
     private static boolean match(final String filename, final String filePattern) {
-		String pattern = StringUtils.replace(filePattern, "*", ".*");
-		pattern = StringUtils.replace(pattern, ".*.*/", ".*/");
-		return FilenameUtils.separatorsToUnix(filename).matches(pattern);
+		String pattern = filePattern.replace("*", ".*");
+		pattern = pattern.replace(".*.*/", ".*/");
+		return filename.matches(pattern);
     }
-
+    
     /**
      * Add a uno component file, for example a jar, shared library or python
      * file containing the uno implementation. The type of the file defines the
