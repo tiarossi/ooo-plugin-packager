@@ -24,8 +24,6 @@
 
 package org.openoffice.plugin.core.utils;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * The commons.io dependency was removed but we need some stuff from the
  * FilenameUtils class. The missing functionality is recoded here.
@@ -55,7 +53,8 @@ public final class FilenameUtils {
 	 * @return the string
 	 */
 	public static String separatorsToUnix(final String filename) {
-		return StringUtils.replaceChars(filename, '\\', '/');
+//		return StringUtils.replaceChars(filename, '\\', '/');
+		return filename.replace( '\\', '/');
 	}
 
 }
