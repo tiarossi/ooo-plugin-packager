@@ -89,6 +89,7 @@ public class UnoPackage {
     private ArrayList<File> mToClean = new ArrayList<File>();
 
     private File mReadManifestFile;
+    private File mCopyManifestFileTo;
 
     /**
      * Create a new package object.
@@ -161,6 +162,12 @@ public class UnoPackage {
         if (pFile != null && pFile.exists()) {
             mReadManifestFile = pFile;
         }
+    }
+    
+    public void setCopyManifestFileTo(File pFile) {
+    	if (pFile != null && !pFile.exists()) {
+    		mCopyManifestFileTo = pFile;
+    	}
     }
 
     /**
@@ -596,6 +603,11 @@ public class UnoPackage {
                     if (manifestFile == null) {
                         manifestFile = createManifestFile();
                         this.addToClean(manifestFile);
+                        
+                        // Copy the manifest file if required
+                        if (mCopyManifestFileTo != null) {
+                        	FileHelper.copyFile(manifestFile, mCopyManifestFileTo, true);
+                        }
                     }
 	                ZipContent manifest = new ZipContent("META-INF/manifest.xml", manifestFile);
 	                manifest.writeContentToZip(zipOut);
@@ -761,16 +773,4 @@ public class UnoPackage {
         }
         return result;
     }
-
-//    /**
-//     * @return the manifest file to write either defined by the setter or the
-//     *         default value.
-//     */
-//    private File getSaveManifestFile() {
-//        File file = mSaveManifestFile;
-//        if (file == null) {
-//            file = new File(MANIFEST_PATH);
-//        }
-//        return file;
-//    }
 }
