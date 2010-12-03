@@ -269,7 +269,7 @@ public class UnoPackage {
             addDialogLibraryFile(pathname, directory, includes, excludes);
         } else {
             for (File child : directory.listFiles()) {
-            	String path = FilenameUtils.normalize(pathname + child.getName());
+            	String path = FilenameUtils.normalize(pathname + "/" + child.getName());
             	if (shouldBeExcluded(path, includes, excludes)) {
             		continue;
             	}
