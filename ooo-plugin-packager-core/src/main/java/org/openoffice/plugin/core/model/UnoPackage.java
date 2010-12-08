@@ -51,6 +51,7 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.*;
 
 /**
@@ -269,7 +270,10 @@ public class UnoPackage {
             addDialogLibraryFile(pathname, directory, includes, excludes);
         } else {
             for (File child : directory.listFiles()) {
-            	String path = FilenameUtils.normalize(pathname + "/" + child.getName());
+            	String path = child.getName();
+            	if (StringUtils.isNotEmpty(pathname)) {
+            		path = FilenameUtils.normalize(pathname + "/" + path);
+            	}
             	if (shouldBeExcluded(path, includes, excludes)) {
             		continue;
             	}
