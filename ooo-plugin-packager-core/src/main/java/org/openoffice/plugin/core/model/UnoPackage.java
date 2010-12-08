@@ -51,7 +51,6 @@ import java.util.jar.JarFile;
 import java.util.logging.Logger;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.openoffice.plugin.core.utils.*;
 
 /**
