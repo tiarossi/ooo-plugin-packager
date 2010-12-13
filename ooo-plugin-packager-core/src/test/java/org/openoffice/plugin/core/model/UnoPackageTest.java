@@ -67,6 +67,8 @@ public final class UnoPackageTest {
 			addToTmpDir(filenames[i], filenames[i] + " created at " + new Date());
 		}
 		log.info(tmpDir + " with " + filenames.length + " files created");
+		Locale.setDefault(Locale.ENGLISH);
+		log.info("Locale=" + Locale.getDefault());
 	}
 	
 	private static void addToTmpDir(final String filename, final String content) throws IOException {
