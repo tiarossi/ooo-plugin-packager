@@ -98,13 +98,17 @@ public final class UnoPackageTest {
 	
 	/**
 	 * Here we delete the directory created for testing.
-	 *
-	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@AfterClass
-	public static void tearDownTmpDir() throws IOException {
-		FileUtils.deleteDirectory(tmpDir);
-		log.info(tmpDir + " is deleted.");
+	public static void tearDownTmpDir() {
+		try {
+			FileUtils.deleteDirectory(tmpDir);
+			log.info(tmpDir + " is deleted.");
+		} catch (IOException ioe) {
+			log.warn(ioe);
+			tmpDir.deleteOnExit();
+			log.info(tmpDir + " will be deleted on exit - please check it");
+		}
 	}
 
 	/**
@@ -146,7 +150,7 @@ public final class UnoPackageTest {
 		assertEquals(new File(tmpDir, "README"), files.get(0));
 		List<String> names = pkg.getContainedNames();
 		assertEquals(1, names.size());
-		assertEquals(new File("test", "README").toString(), names.get(0));
+		assertEquals("test/README", names.get(0));
 	}
 	
 	/**
