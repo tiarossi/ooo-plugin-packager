@@ -33,6 +33,7 @@ import java.util.zip.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.*;
@@ -237,7 +238,12 @@ public final class UnoPackageTest {
 		assertTrue(worldJar + " appear as 'uno-component'",
 				manifest.contains(worldJar.getName()));
 		String expectedManifest = getExpectedManifestContent();
-		assertEquals(expectedManifest, manifest);
+		assertEqualsIgnoreWhitespaces(expectedManifest, manifest);
+	}
+	
+	private void assertEqualsIgnoreWhitespaces(final String expected, final String other) {
+		assertEquals(StringUtils.deleteWhitespace(expected),
+				StringUtils.deleteWhitespace(other));
 	}
 
     private String getManifestContent() throws ZipException, IOException {
