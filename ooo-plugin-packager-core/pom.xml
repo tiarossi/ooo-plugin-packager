@@ -6,13 +6,14 @@
   <parent>
     <groupId>org.openoffice</groupId>
     <artifactId>ooo-plugin-packager</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0-RC1</version>
   </parent>
   <artifactId>ooo-plugin-packager-core</artifactId>
 
   <packaging>jar</packaging>
 
   <name>OOo Plugin Packager Core</name>
+  <description>Common OOo core library for Maven and Eclipse plugin.</description>
 
   <dependencies>
     <dependency>
