@@ -1,6 +1,7 @@
 h1. OOo Plugin Packager
 
 This is the core libary of projects and plugins which want to create an OpenOffice plugin (.oxt file). This library is used by
+
 * "maven-ooo-plugin":https://github.com/fredericmorin/maven-ooo-plugin
 * Eclipse OOo plugin of Cedric Bosdonnat
 The main class of this library is "UnoPackage":https://github.com/fredericmorin/ooo-plugin-packager/blob/master/ooo-plugin-packager-core/src/main/java/org/openoffice/plugin/core/model/UnoPackage.java which represents a UNO package and should be used to create a UNO package. For more information see the Javadocs.
