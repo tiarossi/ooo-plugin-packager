@@ -37,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.*;
+import org.junit.runners.MethodSorters;
 
 /**
  * This is the first JUnit test class for the ooo-plugin-package-core project.
@@ -44,6 +45,7 @@ import org.junit.*;
  * @author oliver (oliver.boehm@agentes.de)
  * @since 0.0.1 (16.08.2010)
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public final class UnoPackageTest {
 	
 	private static final Log log = LogFactory.getLog(UnoPackageTest.class);
@@ -117,8 +119,8 @@ public final class UnoPackageTest {
 	 *
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	@Test
-	public void testUnoPackage() throws IOException {
+    @Test
+    public void test1UnoPackage() throws IOException {
 		pkg.close();
 		assertTrue(tmpFile.isFile());
 	}
@@ -130,7 +132,7 @@ public final class UnoPackageTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testAddContent() throws IOException {
+    public void test2AddContent() throws IOException {
 		pkg.addContent(tmpDir);
 		List<File> files = pkg.getContainedFiles();
 		assertEquals(filenames.length, files.size());
@@ -144,7 +146,7 @@ public final class UnoPackageTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testAddContentNotNormalized() throws IOException {
+    public void test3AddContentNotNormalized() throws IOException {
 		pkg.addContent("test//README", new File(tmpDir + "//README"));
 		List<File> files = pkg.getContainedFiles();
 		assertEquals(1, files.size());
@@ -161,7 +163,7 @@ public final class UnoPackageTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testAddDirectory() throws ZipException, IOException {
+    public void test4AddDirectory() throws ZipException, IOException {
 		String[] includes = {};
 		String[] excludes = { "CVS", "**/CVS", "README" };
 		pkg.addDirectory(tmpDir, includes, excludes);
@@ -186,7 +188,7 @@ public final class UnoPackageTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testCleanResources() throws ZipException, IOException {
+    public void test5CleanResources() throws ZipException, IOException {
 		File manifest = new File("manifest.xml");
 		assertFalse(manifest.getAbsolutePath(), manifest.exists());
 		FileUtils.writeStringToFile(manifest, "tempory created for testing");
@@ -205,7 +207,7 @@ public final class UnoPackageTest {
      * @throws IOException Signals that an I/O exception has occurred.
      */
 	@Test
-    public void testManifestRecognition() throws IOException {
+    public void test6ManifestRecognition() throws IOException {
         String manifestContent = "<Test-Manifest/>";
         addToTmpDir("META-INF/manifest.xml", manifestContent);
         pkg.addDirectory(tmpDir);
@@ -221,7 +223,7 @@ public final class UnoPackageTest {
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	@Test
-	public void testGeneratedManifest() throws IOException {
+    public void test7GeneratedManifest() throws IOException {
 		File metaInfDir = new File(tmpDir, "META-INF");
 		FileUtils.deleteDirectory(metaInfDir);
 		File worldJar = new File("src/test/resources/sample/OOHelloWorld.jar");
@@ -286,7 +288,7 @@ public final class UnoPackageTest {
      * Test method for {@link UnoPackage#hasRegistrationHandlerInside(File)}.
      */
     @Test
-    public void testHasRegistrationHandlerInside() {
+    public void test8HasRegistrationHandlerInside() {
 		File worldJar = new File("src/test/resources/sample/OOHelloWorld.jar");
 		assertTrue(worldJar + " has RegistrationHandler.classes inside",
 				UnoPackage.hasRegistrationHandlerInside(worldJar));
